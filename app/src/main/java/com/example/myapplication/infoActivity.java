@@ -1,5 +1,9 @@
+
 package com.example.myapplication;
 
+import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -11,111 +15,109 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class infoActivity extends AppCompatActivity {
 
     private Bitmap bitmap;
     private ImageView image;
-    private Button pic,go;
-    private EditText name,address;
-    private RadioButton male,female;
-    private boolean f,m;
+    private Button pic, go;
+    private EditText name, address;
+    private RadioButton male, female;
     private Spinner spinner;
-    private String name1,address1;
 
 
 
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_info);
 
-        pic=findViewById(R.id.button2);
-        name=findViewById(R.id.editTextText);
-        address=findViewById(R.id.editTextText2);
-        male=findViewById(R.id.radioButton);
-        female=findViewById(R.id.radioButton2);
-        spinner=findViewById(R.id.spinner);
-        name1 = name.getText().toString();
-        address1 = address.getText().toString();
+
+        image = findViewById(R.id.imageView);
+        pic = findViewById(R.id.button2);
+        go = findViewById(R.id.button3);
+        name = findViewById(R.id.editTextText);
+        address = findViewById(R.id.editTextText2);
+        male = findViewById(R.id.radioButton);
+        female = findViewById(R.id.radioButton2);
+        spinner = findViewById(R.id.spinner);
 
 
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.age, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                    R.array.age, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
 
-
-        String selectedLevel = spinner.getSelectedItem().toString();
 
 
         pic.setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View view) {
-
-             if (view == pic) {
-                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                 startActivityForResult(intent, 1);
-             }
-         }
-     });
-
-
-
-        male.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                m = true;
+                if(view==pic) {
+                    Intent intent = new Intent(ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent,1);
+                }
             }
         });
 
-        female.setOnClickListener(new View.OnClickListener() {
+        go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                f = true;
+
+                String nameValue = name.getText().toString();
+                String addressValue = address.getText().toString();
+
+                if (nameValue.isEmpty() || addressValue.isEmpty()) {
+                    Toast.makeText(infoActivity.this, "الرجاء ملء حقل الاسم والعنوان", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+                if (spinner.getSelectedItem() == null) {
+                    Toast.makeText(infoActivity.this, "الرجاء اختيار العمر", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String selectedAge = spinner.getSelectedItem().toString();
+
+
+                Intent intent = new Intent(infoActivity.this, MainActivity.class);
+                intent.putExtra("name", nameValue);
+                intent.putExtra("address", addressValue);
+                intent.putExtra("age", selectedAge);
+
+                if (bitmap != null) {
+                    intent.putExtra("bitmap", bitmap);
+                }
+
+                if (male.isChecked()) {
+                    intent.putExtra("gender", "male");
+                } else if (female.isChecked()) {
+                    intent.putExtra("gender", "female");
+                } else {
+                    intent.putExtra("gender", "لم يحدد");
+                }
+
+                startActivity(intent);
             }
         });
-
-
-             go.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View view) {
-                     Intent intent = new Intent(infoActivity.this, MainActivity.class);
-                     intent.putExtra("bitmap", bitmap);
-                     intent.putExtra("name", name1);
-                     intent.putExtra("address", address1);
-                     if (f) {
-                         intent.putExtra("gender", "female");
-                     }
-                     if (m) {
-                         intent.putExtra("gender", "male");
-                     }
-                     startActivity(intent);
-                 }
-
-             });
-
-
-
-
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==1){
-            bitmap=data.getParcelableExtra("data");
+        if ( resultCode == RESULT_OK && data != null && data.getExtras() != null) {
+            bitmap = (Bitmap) data.getExtras().get("data");
+            if (bitmap != null) {
+                image.setImageBitmap(bitmap);
 
+            }
         }
     }
 }

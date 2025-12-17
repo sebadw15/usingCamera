@@ -14,22 +14,20 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="159dp"
         android:layout_marginBottom="230dp"
-        android:background="#C62828"
-        android:backgroundTint="#AD1457"
-        android:text="Picture"
+        android:text="back"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         app:iconTint="#6A1B9A"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:rippleColor="#C62828"
-        app:strokeColor="#00838F" />
+     />
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="85dp"
-        android:layout_height="28dp"
-        android:layout_marginTop="86dp"
-        android:layout_marginEnd="164dp"
+        android:layout_width="wrap_content"
+        android:layout_height="79dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginEnd="128dp"
+        android:gravity="center"
         android:text="hello world !"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
